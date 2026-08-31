@@ -110,7 +110,45 @@ except Exception as e:
 
 ---
 
-## Instalacja krok po kroku
+## Instalacja aktualna — laptop `Miko`, 29.08.2026
+
+Wersja odtworzona od zera na nowym laptopie. Różni się od pierwotnej trzema rzeczami:
+**Python 3.13 wystarczy** (3.12 nie jest potrzebny), **wszystko siedzi w venv projektu**
+zamiast w globalnym Pythonie, a **patche nakłada skrypt**, nie ręczna edycja.
+
+Powód venv: streamrip przypina `Pillow 10.4.0`, co przy instalacji globalnej cofa Pillow
+i wywala `pdfplumber` używany w innych projektach IOMJB.
+
+```cmd
+py -3.13 -m venv .venv
+.venv\Scripts\python.exe -m pip install streamrip tidalapi
+.venv\Scripts\python.exe patch.py
+.venv\Scripts\rip.exe config path
+.venv\Scripts\python.exe zaloguj.py
+```
+
+| plik | co robi |
+|---|---|
+| `patch.py` | nakłada oba patche na `streamrip\client\tidal.py`; idempotentny — puszczasz po każdej aktualizacji streamripa. CLIENT_ID/SECRET bierze dynamicznie z tidalapi |
+| `zaloguj.py` | OAuth przez tidalapi i zapis tokenów prosto do `%APPDATA%\streamrip\config.toml` — koniec ręcznego przeklejania |
+| `rip.cmd` | streamrip z venv, bez ruszania globalnego PATH-a: `rip.cmd url <link>` |
+| `na-mp3.py` | konwersja pobranego albumu na MP3 320 z tagami i okładką (wymaga ffmpeg: `winget install Gyan.FFmpeg`) |
+
+### Czego się nauczyliśmy 29.08.2026
+
+- **FLAC nie wchodzi na tym koncie.** Odpytanie API o jakości 3, 2 i 1 zwraca za każdym razem
+  strumień `m4a` — sufitem jest AAC LC 320 kbps. To poziom subskrypcji/kluczy, nie konfiguracji.
+  `[16B-44100kHz]` w nazwie katalogu to metadana albumu, nie tego, co przyszło.
+- **Patch #2 zarabia na siebie przy każdym albumie** — 10 ostrzeżeń „lyrics 401" na album,
+  zero przerwanych tracków.
+- **Token z `zaloguj.py` żyje kilka godzin**, nie tydzień jak pisaliśmy pierwotnie; dalej odnawia
+  się sam przez `refresh_token` (po to jest patch #1). Ręczne logowanie dopiero przy 401.
+
+---
+
+## Instalacja pierwotna (laptop `banam`, 16.05.2026) — instalacja globalna
+
+Zostaje jako zapis drogi; na nowym laptopie używamy wersji wyżej.
 
 ### Wymagania
 

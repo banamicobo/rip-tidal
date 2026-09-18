@@ -3,7 +3,9 @@
     spot.cmd <link Spotify> [...więcej linków] [dodatkowe opcje spotdl]
 
 Spotify daje tylko metadane (tagi, okładka, kolejność); dźwięk spotDL ściąga
-z YouTube Music i dopasowuje po tytule/artyście/długości. Wynik: MP3 320 kbps
+z YouTube Music → YouTube → SoundCloud (w tej kolejności) i dopasowuje po
+tytule/artyście/długości. Ponowne puszczenie tego samego linku dociąga tylko
+brakujące utwory. Wynik: MP3 320 kbps
 z pełnymi tagami ID3 i okładką, w tym samym katalogu co pobrania streamripa.
 
 Album/utwór  -> StreamripDownloads\\{album-artist} - {album} ({year}) [Spotify]\\{nr} - {title}.mp3
@@ -48,6 +50,10 @@ def main() -> int:
     cmd = [
         str(python), "-m", "spotdl",
         "--ffmpeg", znajdz_ffmpeg(),
+        # kolejność = kolejność szukania; SoundCloud ratuje underground (tech-house, sety),
+        # którego YT Music nie ma
+        "--audio", "youtube-music", "youtube", "soundcloud",
+        "--max-retries", "5",
         "--format", "mp3",
         "--bitrate", "320k",
         "--output", str(KATALOG_POBRAN / szablon),

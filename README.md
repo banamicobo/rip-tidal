@@ -280,3 +280,11 @@ wpięta. `na-mp3.py` nie jest tu potrzebny.
 - **Złe dopasowanie zdarza się** (kilka procent na dużej playliście — cover zamiast oryginału, wersja live).
   `--print-errors` wypisze, czego nie znalazł; podejrzane sprawdzasz na ucho.
 - `--overwrite skip` — ponowne puszczenie tego samego linku dociąga tylko brakujące utwory.
+- **Underground (tech-house, sety) w samym YT Music prawie nie istnieje.** Pierwsza playlista (34 utwory):
+  domyślne źródło dało 9/34. Po dołożeniu `--audio youtube-music youtube soundcloud` — 21/34; SoundCloud
+  wyciągnął rzeczy, których nie było nigdzie indziej. Reszta to `LookupError: No results` — dopasowywacz
+  spotDL odrzuca wynik, gdy długość/tytuł nie zgadza się z wersją ze Spotify (radio edit vs. 8-minutowy
+  extended na YT). Puszczaj listę 2–3 razy — część błędów to chwilowe 504 i „Could not get song info".
+- **Niektóre filmy YT wymagają Deno** (`Some YouTube downloads require Deno`) — jednorazowo
+  `.venv\Scripts\python.exe -m spotdl --download-deno`; ląduje w `%USERPROFILE%\.spotdl\deno.exe`
+  (exit code 2 po pobraniu jest normalny — brak query).

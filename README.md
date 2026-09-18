@@ -1,6 +1,6 @@
 # rip-tidal
 
-Kompletny przewodnik instalacji **streamrip** do pobierania muzyki z Tidal na Windows — ze wszystkimi problemami, które po drodze napotkaliśmy.
+Kompletny przewodnik instalacji **streamrip** do pobierania muzyki z Tidal na Windows — ze wszystkimi problemami, które po drodze napotkaliśmy. Od 18.09.2026 także **spotDL** do linków Spotify (sekcja na końcu).
 
 ---
 
@@ -9,6 +9,7 @@ Kompletny przewodnik instalacji **streamrip** do pobierania muzyki z Tidal na Wi
 - Python 3.12
 - [streamrip](https://github.com/nathom/streamrip) 2.1.0
 - [tidalapi](https://github.com/tamland/python-tidal) — do autoryzacji
+- [spotDL](https://github.com/spotDL/spotify-downloader) 4.5.2 — linki Spotify (dźwięk z YouTube Music)
 
 ---
 
@@ -121,7 +122,7 @@ i wywala `pdfplumber` używany w innych projektach IOMJB.
 
 ```cmd
 py -3.13 -m venv .venv
-.venv\Scripts\python.exe -m pip install streamrip tidalapi
+.venv\Scripts\python.exe -m pip install streamrip tidalapi spotdl
 .venv\Scripts\python.exe patch.py
 .venv\Scripts\rip.exe config path
 .venv\Scripts\python.exe zaloguj.py
@@ -133,6 +134,7 @@ py -3.13 -m venv .venv
 | `zaloguj.py` | OAuth przez tidalapi i zapis tokenów prosto do `%APPDATA%\streamrip\config.toml` — koniec ręcznego przeklejania |
 | `rip.cmd` | streamrip z venv, bez ruszania globalnego PATH-a: `rip.cmd url <link>` |
 | `na-mp3.py` | konwersja pobranego albumu na MP3 320 z tagami i okładką (wymaga ffmpeg: `winget install Gyan.FFmpeg`) |
+| `spot.py` / `spot.cmd` | linki Spotify przez spotDL — `spot.cmd <link>`; szczegóły w sekcji *Spotify* na końcu |
 
 ### Czego się nauczyliśmy 29.08.2026
 
@@ -238,3 +240,43 @@ enabled = true
 codec = "MP3"
 lossy_bitrate = 320
 ```
+
+---
+
+## Spotify — spotDL (od 18.09.2026)
+
+**To nie jest rip ze Spotify.** Spotify szyfruje audio (DRM), streamrip go nie obsługuje, a narzędzia
+łamiące szyfrowanie (Zotify/librespot) kończą się banem konta. spotDL robi co innego: ze Spotify bierze
+**tylko metadane** (kolejność, tagi, okładkę, rok), a dźwięk ściąga z **YouTube Music** i dopasowuje po
+tytule, artyście i długości. Zero ryzyka dla konta, żadnego logowania.
+
+```cmd
+spot.cmd https://open.spotify.com/album/...
+spot.cmd https://open.spotify.com/playlist/...
+spot.cmd https://open.spotify.com/track/...  https://open.spotify.com/track/...
+```
+
+Wynik ląduje w tym samym `C:\Users\Miko\StreamripDownloads` co pobrania z Tidala, z `[Spotify]`
+w nazwie katalogu, żeby było widać źródło:
+
+```
+Album / utwór → {artysta} - {album} ({rok}) [Spotify]\{nr} - {tytuł}.mp3
+Playlista     → {nazwa playlisty} [Spotify]\{poz} - {artyści} - {tytuł}.mp3
+```
+
+Pliki wychodzą gotowe: MP3 320 kbps, pełne ID3 (tytuł, artysta, album, rok, nr/liczba utworów), okładka
+wpięta. `na-mp3.py` nie jest tu potrzebny.
+
+### Czego się nauczyliśmy 18.09.2026
+
+- **Instalacja jest bezbolesna** — `pip install spotdl` do tego samego venv, nie rusza Pillow ani streamripa.
+  Żadnych patchy. ffmpeg bierze ten sam co `na-mp3.py` (`spot.py` szuka go w katalogach wingeta, bo nie
+  jest w PATH).
+- **„320 kbps" to bitrate kontenera, nie źródła.** YouTube serwuje ~128–256 kbps (Opus/AAC), spotDL
+  przekodowuje na MP3 320. Realna jakość jest niższa niż AAC 320 z Tidala. Do słuchania w aucie bez różnicy;
+  jeśli album jest na Tidalu — bierz z Tidala.
+- **YT Music czasem nie odpowiada** (`YouTube Music returned no usable results after 3 attempts`) — spotDL
+  sam przechodzi na zwykły YouTube. Na teście trafił w oryginalny klip. Nic nie robić.
+- **Złe dopasowanie zdarza się** (kilka procent na dużej playliście — cover zamiast oryginału, wersja live).
+  `--print-errors` wypisze, czego nie znalazł; podejrzane sprawdzasz na ucho.
+- `--overwrite skip` — ponowne puszczenie tego samego linku dociąga tylko brakujące utwory.

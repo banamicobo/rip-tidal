@@ -289,3 +289,15 @@ wpięta. `na-mp3.py` nie jest tu potrzebny.
 - **Niektóre filmy YT wymagają Deno** (`Some YouTube downloads require Deno`) — jednorazowo
   `.venv\Scripts\python.exe -m spotdl --download-deno`; ląduje w `%USERPROFILE%\.spotdl\deno.exe`
   (exit code 2 po pobraniu jest normalny — brak query).
+- **Czego spotDL nie znajdzie, dobierz z Tidala.** Z 34 utworów playlisty tech-house 13 zostało
+  z `LookupError` — wszystkie 13 były na Tidalu, pierwszy wynik `rip search tidal track "<artysta> <tytuł>"`
+  trafiał za każdym razem, długości zgadzały się co do sekundy. Procedura: `rip search ... -o wyniki.json`
+  (bez menu), `rip id tidal track <ID>` (jedno ID na wywołanie), `ffmpeg -map 0 -c:v copy -c:a libmp3lame
+  -b:a 320k` do katalogu playlisty pod numerem pozycji ze Spotify (`spotdl save <link> --save-file
+  lista.spotdl` daje kolejność). Oryginalne AAC z Tidala są w `Tomasz uro set [Tidal]`.
+- **`rip` z Git Bash: ścieżka `-f /c/Users/...` ląduje w `C:\c\Users\...`** — streamrip nie rozumie
+  formatu POSIX, a Bash nie tłumaczy go w argumencie. Podawaj `C:\Users\...` (w cudzysłowie
+  pojedynczym). Do tego `PYTHONIOENCODING=utf-8`, inaczej spinner (Braille) wywala
+  `UnicodeEncodeError` na cp1250 bez TTY.
+- **„Skipping track — marked as downloaded in the database"** — streamrip pamięta ID w bazie nawet
+  gdy plik poszedł w złe miejsce; ponowne pobranie wymaga `--no-db` (`-ndb`).

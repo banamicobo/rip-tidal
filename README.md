@@ -124,6 +124,7 @@ i wywala `pdfplumber` używany w innych projektach IOMJB.
 py -3.13 -m venv .venv
 .venv\Scripts\python.exe -m pip install streamrip tidalapi spotdl
 .venv\Scripts\python.exe patch.py
+.venv\Scripts\python.exe -m spotdl --download-deno
 .venv\Scripts\rip.exe config path
 .venv\Scripts\python.exe zaloguj.py
 ```

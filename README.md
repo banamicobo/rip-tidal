@@ -147,6 +147,18 @@ py -3.13 -m venv .venv
 - **Token z `zaloguj.py` żyje kilka godzin**, nie tydzień jak pisaliśmy pierwotnie; dalej odnawia
   się sam przez `refresh_token` (po to jest patch #1). Ręczne logowanie dopiero przy 401.
 
+### Czego się nauczyliśmy 04.10.2026
+
+- **Playlista na pendrive:** Miko trzyma sety w `D:\BABLIN2026\<nazwa playlisty>` (pendrive FAT32,
+  15 GB, zwykle mało wolnego miejsca). Kolejność: `rip url` → `na-mp3.py` → kopia katalogu `[MP3]`
+  na pendrive pod nazwą playlisty bez sufiksu. Streamrip nie pisze bezpośrednio na pendrive.
+- **Rozmiar playlisty przed ripem** — tidalapi z tokenami z `config.toml`
+  (`session.load_oauth_session(...)`, `session.playlist(uuid)` → `num_tracks`, `duration`). AAC 320
+  to ok. 2,4 MB/min, MP3 320 tyle samo.
+- **„Failed to get manifest … Retrying with lower quality"** nie musi oznaczać gorszego pliku — w
+  `_set 717` po tym ostrzeżeniu wszystkie 7 plików miało 320 kbps (ffprobe). Sprawdzaj bitrate,
+  zanim uznasz, że utwór przyszedł w gorszej jakości.
+
 ---
 
 ## Instalacja pierwotna (laptop `banam`, 16.05.2026) — instalacja globalna
